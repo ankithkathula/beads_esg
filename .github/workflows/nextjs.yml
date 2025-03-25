@@ -16,7 +16,6 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Build job
   build:
     runs-on: ubuntu-latest
     steps:
@@ -47,7 +46,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
-      # ✅ Add a step to verify the lockfile presence
+      # ✅ Verify lockfile presence
       - name: Verify lockfile presence
         run: |
           ls -la ${{ github.workspace }}
@@ -56,7 +55,7 @@ jobs:
             exit 1
           fi
 
-      # Install dependencies with --no-frozen-lockfile
+      # Install dependencies
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
@@ -64,8 +63,15 @@ jobs:
       - name: Build with Next.js
         run: pnpm next build
 
-      # ✅ No need for `next export` step as it is handled by the config
-      # Exported static files will be in the `out` folder by default
+      # ✅ Ensure the 'out' folder exists
+      - name: Verify export folder
+        run: |
+          if [ ! -d "out" ]; then
+            echo "'out' folder not found. Check Next.js config or export path."
+            exit 1
+          fi
+
+      # ✅ Upload artifact from the correct directory
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
