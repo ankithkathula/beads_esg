@@ -22,20 +22,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Setup Node.js
+      # ✅ Setup Node.js
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      # ✅ Setup pnpm properly
+      # ✅ Setup pnpm
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
           run_install: false
 
-      # Cache dependencies
+      # ✅ Cache dependencies
       - name: Restore cache
         uses: actions/cache@v4
         with:
@@ -46,16 +46,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
-      # ✅ Verify lockfile presence
-      - name: Verify lockfile presence
-        run: |
-          ls -la ${{ github.workspace }}
-          if [ ! -f "pnpm-lock.yaml" ]; then
-            echo "pnpm-lock.yaml not found!"
-            exit 1
-          fi
-
-      # Install dependencies
+      # ✅ Install dependencies
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
@@ -63,7 +54,7 @@ jobs:
       - name: Build with Next.js
         run: pnpm next build
 
-      # ✅ Ensure the 'out' folder exists
+      # ✅ Verify export folder
       - name: Verify export folder
         run: |
           if [ ! -d "out" ]; then
