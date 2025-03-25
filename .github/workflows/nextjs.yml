@@ -28,35 +28,38 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'pnpm'
 
-      # Install pnpm
-      - name: Install pnpm
-        run: npm install -g pnpm@8  # Install pnpm globally
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      # ✅ Setup pnpm properly using pnpm/action-setup
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
         with:
-          static_site_generator: next
+          version: 8
+          run_install: false  # Prevent auto install
 
+      # Cache dependencies
       - name: Restore cache
         uses: actions/cache@v4
         with:
           path: |
+            ~/.pnpm-store
             .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-pnpm-
 
+      # Install dependencies using pnpm
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
+      # Build Next.js site
       - name: Build with Next.js
         run: pnpm next build
 
+      # Export static files
       - name: Export static files
         run: pnpm next export
 
+      # Upload artifact
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
