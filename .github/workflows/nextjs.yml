@@ -56,19 +56,16 @@ jobs:
             exit 1
           fi
 
-      # Install dependencies with --no-frozen-lockfile to bypass the missing lockfile issue
+      # Install dependencies with --no-frozen-lockfile
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      # Build Next.js site
+      # ✅ Build and export using Next.js static export
       - name: Build with Next.js
         run: pnpm next build
 
-      # Export static files
-      - name: Export static files
-        run: pnpm next export
-
-      # Upload artifact
+      # ✅ No need for `next export` step as it is handled by the config
+      # Exported static files will be in the `out` folder by default
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
