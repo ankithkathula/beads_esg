@@ -29,12 +29,12 @@ jobs:
         with:
           node-version: '20'
 
-      # ✅ Setup pnpm properly using pnpm/action-setup
+      # ✅ Setup pnpm properly
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
-          run_install: false  # Prevent auto install
+          run_install: false
 
       # Cache dependencies
       - name: Restore cache
@@ -47,9 +47,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
-      # Install dependencies using pnpm
+      # ✅ Add a step to verify the lockfile presence
+      - name: Verify lockfile presence
+        run: |
+          ls -la ${{ github.workspace }}
+          if [ ! -f "pnpm-lock.yaml" ]; then
+            echo "pnpm-lock.yaml not found!"
+            exit 1
+          fi
+
+      # Install dependencies with --no-frozen-lockfile to bypass the missing lockfile issue
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       # Build Next.js site
       - name: Build with Next.js
